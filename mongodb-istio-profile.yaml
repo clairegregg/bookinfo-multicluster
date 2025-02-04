@@ -1,0 +1,19 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  profile: default 
+  components:
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        service:
+          ports:
+          - name: status-port
+            protocol: TCP
+            port: 15021
+            targetPort: 15021
+          - name: mongodb-tcp 
+            protocol: TCP
+            port: 27017
+            targetPort: 27017

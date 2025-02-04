@@ -23,7 +23,7 @@ spec:
     istio: ingressgateway # use istio default controller
   servers:
   - port:
-      number: 27018
+      number: 27017
       name: mongodb-tcp
       protocol: TCP
     hosts:
@@ -40,7 +40,7 @@ spec:
   - "*"
   tcp:
   - match:
-    - port: 27018 # Matching port in mongodb-gateway
+    - port: 27017 # Matching port in mongodb-gateway
     route:
     - destination:
         host: mongodb # service name
