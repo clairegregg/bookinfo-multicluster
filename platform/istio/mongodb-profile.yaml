@@ -13,15 +13,7 @@ spec:
             protocol: TCP
             port: 15021
             targetPort: 15021
-          - name: http2
-            protocol: TCP
-            port: 80
-            targetPort: 8080
-          - name: https
-            protocol: TCP
-            port: 443
-            targetPort: 8443
           - name: mongodb-tcp 
             protocol: TCP
-            port: 27018
-            targetPort: 27018
+            port: 27017
+            targetPort: 27017
