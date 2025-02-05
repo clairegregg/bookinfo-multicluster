@@ -1,15 +1,19 @@
+$MONGODB_IP=10.6.65.8
+$MONGODB_PORT=27017
+
 ############################
 # 1. Setup MongoDB cluster #
 ############################
 
-kind create cluster --name mongodb --config mongodb-kind-profile.yaml
-istioctl install -y -f mongodb-istio-profile.yaml
+kind create cluster --name mongodb --config platform/kind/mongodb-profile.yaml
+istioctl install -y -f platform/istio/mongodb-profile.yaml
 kubectl label namespace default istio-injection=enabled
 kubectl apply -f platform/kube/bookinfo-db.yaml
 
 # Run port-forwarding in background
-Start-Process -NoNewWindow -RedirectStandardOutput "port-forward.log" -ArgumentList `
-    "kubectl --context kind-mongodb port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 27017:27017"
+Start-Process -FilePath "kubectl" -ArgumentList `
+    "--context kind-mongodb port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 27017:27017" `
+    -NoNewWindow -RedirectStandardOutput "port-forward.log" -RedirectStandardError "port-forward.err" -PassThru
 
 # Wait for MongoDB pod to be ready
 kubectl --context kind-mongodb wait --for=condition=ready pod -l app=mongodb --timeout=300s
@@ -37,7 +41,7 @@ db.createCollection('ratings');
 db.ratings.insertMany([{rating: 1}, {rating: 1}]);
 "@
 
-mongosh 127.0.0.1:27017 --eval $mongoCommands
+$mongoCommands | mongosh 127.0.0.1:27017
 
 # Verify BookInfo User Access
 $output = mongosh 127.0.0.1:27017 -u bookinfo -p 'bookinfo' --authenticationDatabase test --eval "db.ratings.find({});"
@@ -61,11 +65,13 @@ kubectl apply --context kind-bookinfo -f platform/kube/bookinfo.yaml
 kubectl apply --context kind-bookinfo -f networking/bookinfo-gateway.yaml
 kubectl apply --context kind-bookinfo -f networking/destination-rule-all.yaml
 kubectl apply --context kind-bookinfo -f platform/kube/bookinfo-ratings-v2.yaml
-kubectl set --context kind-bookinfo env deployment/ratings-v2 "MONGO_DB_URL=mongodb://bookinfo:bookinfo@127.0.0.1/test?authSource=test&ssl=true"
+kubectl set --context kind-bookinfo env deployment/ratings-v2 "MONGO_DB_URL=mongodb://${MONGODB_IP}:${MONGODB_PORT}/test?authSource=test&ssl=true"
 kubectl apply --context kind-bookinfo -f networking/virtual-service-ratings-db.yaml
+kubectl apply --context kind-bookinfo -f networking/mongo-serviceentry.yaml
 
 # Run port-forwarding in background
-Start-Process -NoNewWindow -RedirectStandardOutput "bookinfo-port-forward.log" -ArgumentList `
-    "kubectl --context kind-bookinfo port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 8080:80"
+Start-Process -FilePath "kubectl" -ArgumentList `
+    "--context kind-bookinfo port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 8080:80" `
+    -NoNewWindow -RedirectStandardOutput "bookinfo-port-forward.log" -RedirectStandardError "bookinfo-port-forward.err" -PassThru
 
-kubectl --context kind-bookinfo wait --for=condition=ready pod -l app=reviews --timeout=300s
+kubectl --context kind-bookinfo wait --for=condition=ready pod -l app=ratings --timeout=300s

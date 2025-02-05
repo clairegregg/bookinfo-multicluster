@@ -1,11 +1,11 @@
+$MONGODB_IP=10.6.65.8
+$MONGODB_PORT=27017
+
 ############################
 # 1. Setup MongoDB cluster #
 ############################
-kind create cluster --name mongodb --config mongodb-kind-profile.yaml
-#kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/main/config/manifests/metallb-native.yaml
-#kubectl apply -f mongodb-metallb.yaml
-#kubectl wait --namespace metallb-system --for=condition=available deployment --all --timeout=120s
-istioctl install -y -f mongodb-istio-profile.yaml
+kind create cluster --name mongodb --config platform/kind/mongodb-profile.yaml
+istioctl install -y -f platform/istio/mongodb-profile.yaml
 kubectl label namespace default istio-injection=enabled
 kubectl apply -f platform/kube/bookinfo-db.yaml
 # This needs to run in the background
@@ -57,8 +57,10 @@ kubectl apply --context kind-bookinfo -f platform/kube/bookinfo.yaml
 kubectl apply --context kind-bookinfo -f networking/bookinfo-gateway.yaml
 kubectl apply --context kind-bookinfo -f networking/destination-rule-all.yaml
 kubectl apply --context kind-bookinfo -f platform/kube/bookinfo-ratings-v2.yaml
-kubectl set --context kind-bookinfo env deployment/ratings-v2 "MONGO_DB_URL=mongodb://bookinfo:bookinfo@127.0.0.1/test?authSource=test&ssl=true"
+kubectl set --context kind-bookinfo env deployment/ratings-v2 "MONGO_DB_URL=mongodb://${MONGODB_IP}:${MONGODB_PORT}/test?authSource=test&ssl=true"
 kubectl apply --context kind-bookinfo -f networking/virtual-service-ratings-db.yaml
+kubectl apply --context kind-bookinfo -f networking/mongo-serviceentry.yaml
+
 # This needs to run in the background
 nohup kubectl --context kind-bookinfo port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 8080:80 > bookinfo-port-forward.log 2>&1 &
 kubectl --context kind-bookinfo wait --for=condition=ready pod -l app=reviews --timeout=300s
