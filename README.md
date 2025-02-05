@@ -4,46 +4,11 @@ Forked from https://github.com/istio/istio for @clairegregg's Master Thesis, as 
 
 See <https://istio.io/docs/examples/bookinfo/>.
 
-## Set up MongoDB cluster
-This project is developed using Minikube to manage Kubernetes clusters.
+## Set up 
+This project is developed locally using kind, with docker port forwarding to allow clusters to contact each other (and to provide access on localhost).
 
-First, create the cluster.
-```
-minikube start -p mongodb
-```
+To setup, run .\setup.ps1 (or the equivalent for Linux).
 
-Now in another terminal, bring up a dashboard to help view what's going on in the cluster
-```
-minikube profile mongodb
-minikube dashboard --url
-```
+Now, mongodb should be accessible on mongodb://127.0.0.1:27017/.
 
-In the original terminal, install istio in the with the appropriate configuration to allow mongodb to be accessed through istio's ingress:
-```
-istioctl install -f mongodb-profile.yaml
-```
-
-Next, enable istio sidecar injection
-```
-kubectl label namespace default istio-injection=enabled
-```
-
-Now, deploy mongodb and the associated resources:
-```
-kubectl apply -f platform/kube/bookinfo-db.yaml
-```
-
-In another tab, open a minikube tunnel so that the cluster's ingress can be accessed on the local machine's localhost:
-```
-minikube profile mongodb
-minikube tunnel
-```
-
-Finally, back in the original tab, you can verify that the ingress is up and running, and confirm that the external IP is set up correctly:
-```
-export INGRESS_NAME=istio-ingressgateway
-export INGRESS_NS=istio-system
-kubectl get svc "$INGRESS_NAME" -n "$INGRESS_NS"
-```
-
-Now, mongodb should be accessible on mongodb://127.0.0.1:27018/
+The application should be available on localhost:8080/productpage.
