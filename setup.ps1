@@ -1,14 +1,14 @@
-$MONGODB_IP=10.6.65.8
+$MONGODB_IP="10.0.0.7"
 $MONGODB_PORT=27017
 
 ############################
 # 1. Setup MongoDB cluster #
 ############################
 
-kind create cluster --name mongodb --config platform/kind/mongodb-profile.yaml
-istioctl install -y -f platform/istio/mongodb-profile.yaml
+kind create cluster --name mongodb --config platform\kind\mongodb-profile.yaml
+istioctl install -y -f platform\istio\mongodb-profile.yaml 
 kubectl label namespace default istio-injection=enabled
-kubectl apply -f platform/kube/bookinfo-db.yaml
+kubectl apply -f platform\kube\bookinfo-db.yaml
 
 # Run port-forwarding in background
 Start-Process -FilePath "kubectl" -ArgumentList `
@@ -38,7 +38,7 @@ db.createUser({
     roles: ['read']
 });
 db.createCollection('ratings');
-db.ratings.insertMany([{rating: 1}, {rating: 1}]);
+db.ratings.insertMany([{"productid": 0, "rating": 3}, {"productid": 0, "rating": 3}]);
 "@
 
 $mongoCommands | mongosh 127.0.0.1:27017
@@ -59,13 +59,13 @@ if ($output -match "rating") {
 #############################
 
 kind create cluster --name bookinfo
-istioctl install -y
+istioctl install -y --set meshConfig.accessLogFile=bookinfo-envoy.log
 kubectl label --context kind-bookinfo namespace default istio-injection=enabled
 kubectl apply --context kind-bookinfo -f platform/kube/bookinfo.yaml
 kubectl apply --context kind-bookinfo -f networking/bookinfo-gateway.yaml
 kubectl apply --context kind-bookinfo -f networking/destination-rule-all.yaml
 kubectl apply --context kind-bookinfo -f platform/kube/bookinfo-ratings-v2.yaml
-kubectl set --context kind-bookinfo env deployment/ratings-v2 "MONGO_DB_URL=mongodb://${MONGODB_IP}:${MONGODB_PORT}/test?authSource=test&ssl=true"
+kubectl set --context kind-bookinfo env deployment/ratings-v2 "MONGO_DB_URL=mongodb://bookinfo:bookinfo@${MONGODB_IP}:${MONGODB_PORT}/test?authSource=test&ssl=true"
 kubectl apply --context kind-bookinfo -f networking/virtual-service-ratings-db.yaml
 kubectl apply --context kind-bookinfo -f networking/mongo-serviceentry.yaml
 

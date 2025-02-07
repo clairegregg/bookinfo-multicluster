@@ -89,6 +89,8 @@ dispatcher.onPost(/^\/ratings\/[0-9]*/, function (req, res) {
 dispatcher.onGet(/^\/ratings\/[0-9]*/, function (req, res) {
   var productIdStr = req.url.split('/').pop()
   var productId = parseInt(productIdStr)
+  console.log("MongoDB url is")
+  console.log(url)
 
   if (Number.isNaN(productId)) {
     res.writeHead(400, {'Content-type': 'application/json'})
@@ -146,7 +148,7 @@ dispatcher.onGet(/^\/ratings\/[0-9]*/, function (req, res) {
           console.log(err)
         } else {
           const db = client.db("test")
-          db.collection('ratings').find({}).toArray(function (err, data) {
+          db.collection('ratings').find({"productid": productId}).toArray(function (err, data) {
             if (err) {
               res.writeHead(500, {'Content-type': 'application/json'})
               res.end(JSON.stringify({error: 'could not load ratings from database'}))

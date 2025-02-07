@@ -6,7 +6,7 @@ spec:
   hosts:
   - my-mongo.tcp.svc
   addresses:
-  - 10.6.65.8/32
+  - 10.0.0.7/32
   ports:
   - number: 27017
     name: tcp
@@ -14,4 +14,4 @@ spec:
   location: MESH_EXTERNAL
   resolution: STATIC
   endpoints:
-  - address: 10.6.65.8
+  - address: 10.0.0.7

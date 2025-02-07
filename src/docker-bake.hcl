@@ -7,7 +7,7 @@ variable "HUB" {
 }
 
 variable "PLATFORMS" {
-  default = "linux/amd64,linux/arm64"
+  default = "linux/amd64"
 }
 
 images = [
@@ -129,7 +129,7 @@ target "default" {
     item = images
   }
   name    = item.name
-  context = "./samples/bookinfo/src/${item.source}"
+  context = "./src/${item.source}"
   tags    = [
     for x in setproduct([HUB], "${split(",", TAGS)}") : join("/${item.name}:", x)
   ]

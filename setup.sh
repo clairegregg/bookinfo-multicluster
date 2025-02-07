@@ -1,4 +1,4 @@
-$MONGODB_IP=10.6.65.8
+$MONGODB_IP=10.0.0.7
 $MONGODB_PORT=27017
 
 ############################
@@ -31,7 +31,7 @@ db.createUser({
     roles: ['read']
 });
 db.createCollection('ratings');
-db.ratings.insertMany([{rating: 1}, {rating: 1}]);
+db.ratings.insertMany([{"productid": 0, "rating": 3}, {"productid": 0, "rating": 3}]);
 EOF
 
 
