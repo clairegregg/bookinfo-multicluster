@@ -1,23 +1,23 @@
-$MONGODB_IP=10.0.0.7
-$MONGODB_PORT=27017
+source .env
 
 ############################
 # 1. Setup MongoDB cluster #
 ############################
 kind create cluster --name mongodb --config platform/kind/mongodb-profile.yaml
-istioctl install -y -f platform/istio/mongodb-profile.yaml
+istioctl install -y -f platform/istio/mongodb-profile.yaml --set meshConfig.accessLogFile=/dev/stdout
 kubectl label namespace default istio-injection=enabled
 kubectl apply -f platform/kube/bookinfo-db.yaml
-# This needs to run in the background
-nohup kubectl --context kind-mongodb port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 27017:27017 > port-forward.log 2>&1 &
+echo "Waiting for mongodb to be ready"
 kubectl --context kind-mongodb wait --for=condition=ready pod -l app=mongodb --timeout=300s
+# This needs to run in the background
+nohup kubectl --context kind-mongodb port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 27018:27017 > port-forward.log 2>&1 &
 
 
 ########################
 # 2. Configure MongoDB #
 ########################
 sleep 5
-mongosh 127.0.0.1:27017 <<EOF
+mongosh 127.0.0.1:27018 <<EOF
 use admin;
 db.createUser({
     user: 'admin',
@@ -36,7 +36,7 @@ EOF
 
 
 # Connect to MongoDB as bookinfo and query the ratings collection
-output=$(mongosh 127.0.0.1:27017 -u bookinfo -p 'bookinfo' --authenticationDatabase test --eval "db.ratings.find({});")
+output=$(mongosh 127.0.0.1:27018 -u bookinfo -p 'bookinfo' --authenticationDatabase test --eval "db.ratings.find({});")
 
 # Check if the expected result is in the output
 if [[ "$output" == *"rating"* ]]; then
@@ -57,7 +57,7 @@ kubectl apply --context kind-bookinfo -f platform/kube/bookinfo.yaml
 kubectl apply --context kind-bookinfo -f networking/bookinfo-gateway.yaml
 kubectl apply --context kind-bookinfo -f networking/destination-rule-all.yaml
 kubectl apply --context kind-bookinfo -f platform/kube/bookinfo-ratings-v2.yaml
-kubectl set --context kind-bookinfo env deployment/ratings-v2 "MONGO_DB_URL=mongodb://${MONGODB_IP}:${MONGODB_PORT}/test?authSource=test&ssl=true"
+kubectl set --context kind-bookinfo env deployment/ratings-v2 "MONGO_DB_URL=mongodb://${MONGODB_IP}:${MONGODB_PORT}/test?authSource=test"
 kubectl apply --context kind-bookinfo -f networking/virtual-service-ratings-db.yaml
 kubectl apply --context kind-bookinfo -f networking/mongo-serviceentry.yaml
 
