@@ -50,7 +50,7 @@ spec:
     spec:
       containers:
       - name: ratings
-        image: docker.io/clairegregg/examples-bookinfo-ratings-v1:v0.0.0
+        image: docker.io/clairegregg/examples-bookinfo-ratings-v1:v0.0.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9080

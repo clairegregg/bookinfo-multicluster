@@ -78,8 +78,39 @@ dispatcher.onPost(/^\/ratings\/[0-9]*/, function (req, res) {
   }
 
   if (process.env.SERVICE_VERSION === 'v2') { // the version that is backed by a database
-    res.writeHead(501, {'Content-type': 'application/json'})
-    res.end(JSON.stringify({error: 'Post not implemented for database backed ratings'}))
+    if (process.env.DB_TYPE === 'mysql') {
+      res.writeHead(501, {'Content-type': 'application/json'})
+      res.end(JSON.stringify({error: 'Post not implemented for mySQL backed ratings'}))
+    } else {
+      MongoClient.connect(url, function (err, client) {
+        if (err) {
+          res.writeHead(500, {'Content-type': 'application/json'})
+          res.end(JSON.stringify({error: 'could not connect to ratings database'}))
+          console.log(err)
+        } else {
+          var newRatings = new [];
+          ratings.forEach(rating => {
+            newRatings.push({
+              productId: productId,
+              rating: rating 
+            })
+          });
+          const db = client.db("test")
+          db.collection('ratings').insertMany(newRatings, function(err, res) {
+            if (err) {
+              res.writeHead(500, {'Content-type': 'application/json'})
+              res.end(JSON.stringify({error: 'failed to write new ratings to backend'}))
+              console.log(err)
+            } else {
+              res.writeHead(200, {'Content-type': 'application/json'})
+              res.end(JSON.stringify(newRatings))
+            }
+            // close client once done:
+            client.close()
+          })
+        }
+      })
+    }
   } else { // the version that holds ratings in-memory
     res.writeHead(200, {'Content-type': 'application/json'})
     res.end(JSON.stringify(putLocalReviews(productId, ratings)))

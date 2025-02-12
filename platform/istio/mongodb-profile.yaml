@@ -18,4 +18,4 @@ spec:
             port: 27017
             targetPort: 27017
   meshConfig:
-    accessLogFile: mongodb-envoy.log
+    accessLogFile: /dev/stdout
