@@ -112,6 +112,47 @@ paths:
             $ref: "#/definitions/ProductRatings"
         400:
           description: "Invalid product id"
+    # Note that this currently does not accept reviewer name to add to reviews, as the current design of the ratings service does not accept a reviewer name.
+    post:
+      tags:
+      - "rating"
+      summary: "Add new ratings for a product"
+      description: "Add new ratings for a product, from 1-5 stars."
+      operationId: "postProductRatings"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Product id"
+        required: true
+        type: "integer"
+        format: "int32"
+      requestBody:
+        description: "New ratings to add for the product"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ratings:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        200:
+          description: "successful operation"
+          schema: 
+            type: array
+            items:
+              type: integer
+        400:
+          description: "Invalid product id or failed to write to DB, check logs."
+
+
 
 
 definitions:

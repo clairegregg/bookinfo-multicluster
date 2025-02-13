@@ -8,7 +8,7 @@ istioctl install -y -f platform/istio/mongodb-profile.yaml
 kubectl label namespace default istio-injection=enabled
 kubectl apply -f platform/kube/bookinfo-db.yaml
 
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yam
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
 
@@ -85,7 +85,7 @@ EOF
 
 # This needs to run in the background
 nohup kubectl --context kind-bookinfo port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 8080:80 > bookinfo-port-forward.log 2>&1 &
-kubectl --context kind-bookinfo wait --for=condition=ready pod -l app=reviews --timeout=300s
+kubectl wait --context kind-bookinfo --for=condition=ready $(kubectl get pod -o name) --timeout 300s
 
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml

@@ -17,7 +17,7 @@ The application should be available on localhost:8080/productpage.
 
 ```
 export HUB="docker.io/clairegregg"
-export TAG="v0.0.1"
+export TAG="v0.0.4"
 ```
 
 To compile the code...
@@ -32,5 +32,5 @@ BOOKINFO_LATEST=true BOOKINFO_TAG=$TAG BOOKINFO_HUB=$HUB src/build-services.sh -
 
 To update the yaml files...
 ```
-BOOKINFO_UPDATE=true BOOKINFO_TAG=$TAG BOOKINFO_HUB=$HUB src/build-services.sh --push
+BOOKINFO_UPDATE=true BOOKINFO_LATEST=true BOOKINFO_TAG=$TAG BOOKINFO_HUB=$HUB src/build-services.sh --push
 ```

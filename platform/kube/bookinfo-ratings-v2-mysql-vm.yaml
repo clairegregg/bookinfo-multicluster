@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: ratings
-        image: docker.io/clairegregg/examples-bookinfo-ratings-v2:v0.0.1
+        image: docker.io/clairegregg/examples-bookinfo-ratings-v2:v0.0.4
         imagePullPolicy: IfNotPresent
         env:
           # This assumes you registered your mysql vm as

@@ -62,18 +62,21 @@ dispatcher.onPost(/^\/ratings\/[0-9]*/, function (req, res) {
   var productIdStr = req.url.split('/').pop()
   var productId = parseInt(productIdStr)
   var ratings = {}
+  console.log("Received following request", req.body)
 
   if (Number.isNaN(productId)) {
     res.writeHead(400, {'Content-type': 'application/json'})
     res.end(JSON.stringify({error: 'please provide numeric product ID'}))
+    console.log("NaN")
     return
   }
 
   try {
-    ratings = JSON.parse(req.body)
+    ratings = JSON.parse(req.body)["ratings"]
   } catch (error) {
     res.writeHead(400, {'Content-type': 'application/json'})
     res.end(JSON.stringify({error: 'please provide valid ratings JSON'}))
+    console.log("Bad JSON")
     return
   }
 
@@ -88,7 +91,7 @@ dispatcher.onPost(/^\/ratings\/[0-9]*/, function (req, res) {
           res.end(JSON.stringify({error: 'could not connect to ratings database'}))
           console.log(err)
         } else {
-          var newRatings = new [];
+          var newRatings = [];
           ratings.forEach(rating => {
             newRatings.push({
               productId: productId,
@@ -96,12 +99,14 @@ dispatcher.onPost(/^\/ratings\/[0-9]*/, function (req, res) {
             })
           });
           const db = client.db("test")
-          db.collection('ratings').insertMany(newRatings, function(err, res) {
+          db.collection('ratings').insertMany(newRatings, function(err, result) {
             if (err) {
+              console.log("Something bad...")
               res.writeHead(500, {'Content-type': 'application/json'})
               res.end(JSON.stringify({error: 'failed to write new ratings to backend'}))
               console.log(err)
             } else {
+              console.log("yipeeee")
               res.writeHead(200, {'Content-type': 'application/json'})
               res.end(JSON.stringify(newRatings))
             }
