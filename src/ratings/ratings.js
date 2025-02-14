@@ -94,8 +94,8 @@ dispatcher.onPost(/^\/ratings\/[0-9]*/, function (req, res) {
           var newRatings = [];
           ratings.forEach(rating => {
             newRatings.push({
-              productId: productId,
-              rating: rating 
+              productid: productId,
+              rating: Number(rating) 
             })
           });
           const db = client.db("test")
@@ -184,17 +184,26 @@ dispatcher.onGet(/^\/ratings\/[0-9]*/, function (req, res) {
           console.log(err)
         } else {
           const db = client.db("test")
+          db.collect
+          db.collection('ratings').find({}).toArray(function (err, data) {
+            console.log(data)
+          })
           db.collection('ratings').find({"productid": productId}).toArray(function (err, data) {
             if (err) {
               res.writeHead(500, {'Content-type': 'application/json'})
               res.end(JSON.stringify({error: 'could not load ratings from database'}))
               console.log(err)
             } else {
-              if (data[0]) {
-                firstRating = data[0].rating
+              console.log(data)
+              var dataLen = data.length
+              console.log(dataLen)
+              console.log(data[dataLen-2])
+              console.log(data[dataLen-1])
+              if (data[dataLen-2]) {
+                firstRating = data[dataLen-2].rating
               }
-              if (data[1]) {
-                secondRating = data[1].rating
+              if (data[dataLen-1]) {
+                secondRating = data[dataLen-1].rating
               }
               var result = {
                 id: productId,

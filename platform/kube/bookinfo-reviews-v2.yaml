@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
       - name: reviews
-        image: docker.io/clairegregg/examples-bookinfo-reviews-v2:v0.0.4
+        image: docker.io/clairegregg/examples-bookinfo-reviews-v2:v0.0.5
         imagePullPolicy: IfNotPresent
         env:
         - name: LOG_DIR

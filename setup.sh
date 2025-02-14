@@ -4,7 +4,7 @@ source .env
 # 1. Setup MongoDB cluster #
 ############################
 kind create cluster --name mongodb --config platform/kind/mongodb-profile.yaml
-istioctl install -y -f platform/istio/mongodb-profile.yaml
+istioctl install -y -f platform/istio/mongodb-profile.yaml --set=hub=gcr.io/istio-release
 kubectl label namespace default istio-injection=enabled
 kubectl apply -f platform/kube/bookinfo-db.yaml
 
@@ -55,7 +55,7 @@ fi
 # 3. Setup BookInfo cluster #
 #############################
 kind create cluster --name bookinfo
-istioctl install -y --set meshConfig.accessLogFile=/dev/stdout
+istioctl install -y --set meshConfig.accessLogFile=/dev/stdout --set=hub=gcr.io/istio-release
 kubectl label --context kind-bookinfo namespace default istio-injection=enabled
 kubectl apply --context kind-bookinfo -f platform/kube/bookinfo.yaml
 kubectl apply --context kind-bookinfo -f networking/bookinfo-gateway.yaml
