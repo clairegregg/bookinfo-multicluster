@@ -62,24 +62,60 @@ dispatcher.onPost(/^\/ratings\/[0-9]*/, function (req, res) {
   var productIdStr = req.url.split('/').pop()
   var productId = parseInt(productIdStr)
   var ratings = {}
+  console.log("Received following request", req.body)
 
   if (Number.isNaN(productId)) {
     res.writeHead(400, {'Content-type': 'application/json'})
     res.end(JSON.stringify({error: 'please provide numeric product ID'}))
+    console.log("NaN")
     return
   }
 
   try {
-    ratings = JSON.parse(req.body)
+    ratings = JSON.parse(req.body)["ratings"]
   } catch (error) {
     res.writeHead(400, {'Content-type': 'application/json'})
     res.end(JSON.stringify({error: 'please provide valid ratings JSON'}))
+    console.log("Bad JSON")
     return
   }
 
   if (process.env.SERVICE_VERSION === 'v2') { // the version that is backed by a database
-    res.writeHead(501, {'Content-type': 'application/json'})
-    res.end(JSON.stringify({error: 'Post not implemented for database backed ratings'}))
+    if (process.env.DB_TYPE === 'mysql') {
+      res.writeHead(501, {'Content-type': 'application/json'})
+      res.end(JSON.stringify({error: 'Post not implemented for mySQL backed ratings'}))
+    } else {
+      MongoClient.connect(url, function (err, client) {
+        if (err) {
+          res.writeHead(500, {'Content-type': 'application/json'})
+          res.end(JSON.stringify({error: 'could not connect to ratings database'}))
+          console.log(err)
+        } else {
+          var newRatings = [];
+          ratings.forEach(rating => {
+            newRatings.push({
+              productid: productId,
+              rating: Number(rating) 
+            })
+          });
+          const db = client.db("test")
+          db.collection('ratings').insertMany(newRatings, function(err, result) {
+            if (err) {
+              console.log("Something bad...")
+              res.writeHead(500, {'Content-type': 'application/json'})
+              res.end(JSON.stringify({error: 'failed to write new ratings to backend'}))
+              console.log(err)
+            } else {
+              console.log("yipeeee")
+              res.writeHead(200, {'Content-type': 'application/json'})
+              res.end(JSON.stringify(newRatings))
+            }
+            // close client once done:
+            client.close()
+          })
+        }
+      })
+    }
   } else { // the version that holds ratings in-memory
     res.writeHead(200, {'Content-type': 'application/json'})
     res.end(JSON.stringify(putLocalReviews(productId, ratings)))
@@ -89,6 +125,8 @@ dispatcher.onPost(/^\/ratings\/[0-9]*/, function (req, res) {
 dispatcher.onGet(/^\/ratings\/[0-9]*/, function (req, res) {
   var productIdStr = req.url.split('/').pop()
   var productId = parseInt(productIdStr)
+  console.log("MongoDB url is")
+  console.log(url)
 
   if (Number.isNaN(productId)) {
     res.writeHead(400, {'Content-type': 'application/json'})
@@ -146,17 +184,26 @@ dispatcher.onGet(/^\/ratings\/[0-9]*/, function (req, res) {
           console.log(err)
         } else {
           const db = client.db("test")
+          db.collect
           db.collection('ratings').find({}).toArray(function (err, data) {
+            console.log(data)
+          })
+          db.collection('ratings').find({"productid": productId}).toArray(function (err, data) {
             if (err) {
               res.writeHead(500, {'Content-type': 'application/json'})
               res.end(JSON.stringify({error: 'could not load ratings from database'}))
               console.log(err)
             } else {
-              if (data[0]) {
-                firstRating = data[0].rating
+              console.log(data)
+              var dataLen = data.length
+              console.log(dataLen)
+              console.log(data[dataLen-2])
+              console.log(data[dataLen-1])
+              if (data[dataLen-2]) {
+                firstRating = data[dataLen-2].rating
               }
-              if (data[1]) {
-                secondRating = data[1].rating
+              if (data[dataLen-1]) {
+                secondRating = data[dataLen-1].rating
               }
               var result = {
                 id: productId,

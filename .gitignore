@@ -1,3 +1,5 @@
 *.err
 *.log
 kind
+*.bak
+*.env

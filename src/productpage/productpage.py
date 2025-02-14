@@ -300,11 +300,23 @@ def reviewsRoute(product_id):
     return json.dumps(reviews), status, {'Content-Type': 'application/json'}
 
 
-@app.route('/api/v1/products/<product_id>/ratings')
+@app.route('/api/v1/products/<product_id>/ratings', methods=['GET'])
 def ratingsRoute(product_id):
     headers = getForwardHeaders(request)
     status, ratings = getProductRatings(product_id, headers)
     return json.dumps(ratings), status, {'Content-Type': 'application/json'}
+
+@app.route('/api/v1/products/<product_id>/ratings', methods=['POST'])
+def ratingsPostRoute(product_id):
+    headers = getForwardHeaders(request)
+    try:
+        body = request.json
+        logging.info("Body is ")
+        logging.info(body)
+        status, new_ratings = postProductRatings(product_id, headers, body)
+        return json.dumps(new_ratings), status, {'Content-Type': 'application/json'}
+    except json.JSONDecodeError:
+        return json.dumps({"error": "Invalid JSON"}), 400, {'Content-Type': 'application/json'}
 
 
 @app.route('/metrics')
@@ -377,6 +389,19 @@ def getProductRatings(product_id, headers):
         request_result_counter.labels(destination_app='ratings', response_code=status).inc()
         return status, {'error': 'Sorry, product ratings are currently unavailable for this book.'}
 
+def postProductRatings(product_id, headers, body):
+    try:
+        url = ratings['name'] + "/" + ratings['endpoint'] + "/" + str(product_id)
+        res = requests.post(url, headers=headers, timeout=3.0, json=body)
+    except BaseException:
+        res = None
+    if res and res.status_code == 200:
+        request_result_counter.labels(destination_app='ratings', response_code=200).inc()
+        return 200, res.json()
+    else:
+        status = res.status_code if res is not None and res.status_code else 500
+        request_result_counter.labels(destination_app='ratings', response_code=status).inc()
+        return status, {'error': 'Sorry, it is not currently possible to update product ratings for this book.'}
 
 def send_request(url, **kwargs):
     # We intentionally do not pool so that we can easily test load distribution across many versions of our backends

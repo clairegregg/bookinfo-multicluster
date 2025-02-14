@@ -16,10 +16,6 @@
 
 set -ox errexit
 
-# Get to the root directory of the repo...
-SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-cd "$SCRIPTDIR/../../.."
-
 h="${BOOKINFO_HUB:?BOOKINFO_HUB must be set}"
 t="${BOOKINFO_TAG:?BOOKINFO_TAG must be set}"
 if [[ ("${h}" == "istio" || "${h}" == "docker.io/istio") && -z "$CI" && "$*" =~ "--push" ]]; then
@@ -33,10 +29,10 @@ fi
 
 # Pass input args to the command. This allows using --push, --load, etc
 env TAGS="${BOOKINFO_TAG}" HUB="${BOOKINFO_HUB}" \
-  docker buildx bake -f samples/bookinfo/src/docker-bake.hcl "$@"
+  docker buildx bake -f src/docker-bake.hcl "$@"
 
 if [[ "${BOOKINFO_UPDATE}" == "true" ]]; then
 # Update image references in the yaml files
-  find ./samples/bookinfo/platform -name "*bookinfo*.yaml" -exec sed -i.bak "s#image:.*\\(\\/examples-bookinfo-.*\\):.*#image: ${h//\//\\/}\\1:$t#g" {} +
+  find ./platform -name "*bookinfo*.yaml" -exec sed -i.bak "s#image:.*\\(\\/examples-bookinfo-.*\\):.*#image: ${h//\//\\/}\\1:$t#g" {} +
 fi
 
