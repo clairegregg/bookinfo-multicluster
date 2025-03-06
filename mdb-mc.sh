@@ -45,3 +45,34 @@ rs.initiate({
     { _id: 1, host: "mongodb2.mongodb.svc.cluster.local:27017" }
   ]
 })'
+
+########################
+# 4. Configure MongoDB #
+########################
+kubectl exec -n mongodb svc/mongodb1 -- mongosh <<EOF
+use admin;
+db.createUser({
+    user: 'admin',
+    pwd: 'admin',
+    roles: ['root']
+});
+use test;
+db.createUser({
+    user: 'bookinfo',
+    pwd: 'bookinfo',
+    roles: ['readWrite']
+});
+db.createCollection('ratings');
+db.ratings.insertMany([{"productid": 0, "rating": 3}, {"productid": 0, "rating": 3}]);
+EOF
+
+output=$(kubectl exec -n mongodb svc/mongodb1 -- mongosh -u bookinfo -p 'bookinfo' --authenticationDatabase test --eval "db.ratings.find({});")
+
+# Check if the expected result is in the output
+if [[ "$output" == *"rating"* ]]; then
+    echo "bookinfo user is able to access the required database!"
+else
+    echo "Something failed to configure for the bookinfo user:\n"
+    echo $output
+    exit 0
+fi
