@@ -5,7 +5,9 @@ Forked from https://github.com/istio/istio for @clairegregg's Master Thesis, as 
 See <https://istio.io/docs/examples/bookinfo/>.
 
 ## Set up 
-This project is developed locally using kind, with docker port forwarding to allow clusters to contact each other (and to provide access on localhost).
+This project is developed locally using kind, making using of https://github.com/clairegregg/multi-cluster-istio-kind (originally forked from https://github.com/sedflix/multi-cluster-istio-kind) to allow multicluster work, including making use of Istio.
+
+To setup, navigate to that repository and run ./fast-setup to create 4 kind clusters connected in an Istio mesh.
 
 To setup, run .\setup.ps1 (or the equivalent for Linux).
 
@@ -17,7 +19,7 @@ The application should be available on localhost:8080/productpage.
 
 ```
 export HUB="docker.io/clairegregg"
-export TAG="v0.0.5"
+export TAG="v1.0.0"
 ```
 
 To compile the code...
