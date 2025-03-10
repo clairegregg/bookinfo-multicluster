@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb1
+  labels:
+    app: mongodb1
+    service: mongodb1
+spec:
+  ports:
+  - port: 27017
+    name: mongodb-tcp
+  selector:
+    app: mongodb1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb2
+  labels:
+    app: mongodb2
+    service: mongodb2
+spec:
+  ports:
+  - port: 27017
+    name: mongodb-tcp
+  selector:
+    app: mongodb2
