@@ -1,5 +1,3 @@
-source .env
-
 ##############################
 # 1. Setup MongoDB cluster 1 #
 ##############################
@@ -11,7 +9,7 @@ sed -e "s/{i}/1/g" -e "s/{j}/2/g" platform/kube/bookinfo-db.yaml | kubectl apply
 # kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
 # kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
 # kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
-
+sleep 2s
 echo "Waiting for mongodb to be ready"
 kubectl wait --for=condition=ready pod -l app=mongodb1 --timeout=300s -n mongodb
 
@@ -26,7 +24,7 @@ sed -e "s/{i}/2/g" -e "s/{j}/1/g" platform/kube/bookinfo-db.yaml | kubectl apply
 # kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
 # kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
 # kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
-
+sleep 2s
 echo "Waiting for mongodb to be ready"
 kubectl wait --for=condition=ready pod -l app=mongodb2 --timeout=300s -n mongodb
 
