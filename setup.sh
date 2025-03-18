@@ -41,7 +41,9 @@ kubectl exec -n mongodb svc/mongodb1 -- mongosh --eval 'rs.initiate(
         ]
     }
 )'
+sleep 5s
 kubectl exec -n mongodb svc/mongodb1 -- mongosh --eval 'rs.add("mongodb2.mongodb.svc.cluster.local:27017")'
+sleep 5s
 
 ########################
 # 4. Configure MongoDB #
