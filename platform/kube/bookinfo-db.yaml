@@ -62,7 +62,7 @@ spec:
     spec:
       containers:
       - name: mongodb{i} 
-        image: docker.io/clairegregg/examples-bookinfo-mongodb:v1.0.0
+        image: docker.io/clairegregg/examples-bookinfo-mongodb:v1.0.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 27017

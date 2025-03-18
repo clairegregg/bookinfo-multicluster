@@ -19,7 +19,7 @@ The application should be available on localhost:8080/productpage.
 
 ```
 export HUB="docker.io/clairegregg"
-export TAG="v1.0.0"
+export TAG="v1.0.1"
 ```
 
 To compile the code...
