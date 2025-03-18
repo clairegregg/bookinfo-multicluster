@@ -27,7 +27,7 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master
 sleep 2s
 echo "Waiting for mongodb to be ready"
 kubectl wait --for=condition=ready pod -l app=mongodb2 --timeout=300s -n mongodb
-sleep 5s
+sleep 10s
 
 
 #########################
