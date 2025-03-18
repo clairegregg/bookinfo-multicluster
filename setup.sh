@@ -6,9 +6,9 @@ kubectl create namespace mongodb
 kubectl label namespace mongodb istio-injection=enabled
 sed -e "s/{i}/1/g" -e "s/{j}/2/g" platform/kube/bookinfo-db.yaml | kubectl apply -n mongodb -f -
 
-# kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
-# kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
-# kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
 sleep 2s
 echo "Waiting for mongodb to be ready"
 kubectl wait --for=condition=ready pod -l app=mongodb1 --timeout=300s -n mongodb
@@ -21,9 +21,9 @@ kubectl create namespace mongodb
 kubectl label namespace mongodb istio-injection=enabled
 sed -e "s/{i}/2/g" -e "s/{j}/1/g" platform/kube/bookinfo-db.yaml | kubectl apply -n mongodb -f  -
 
-# kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
-# kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
-# kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
 sleep 2s
 echo "Waiting for mongodb to be ready"
 kubectl wait --for=condition=ready pod -l app=mongodb2 --timeout=300s -n mongodb
@@ -97,9 +97,9 @@ kubectl set env deployment/ratings-v2 "MONGO_DB_URL=mongodb://mongodb1.mongodb.s
 nohup kubectl port-forward --address 0.0.0.0 -n istio-system svc/istio-ingressgateway 5501:80 > bookinfo-port-forward.log 2>&1 &
 kubectl wait --for=condition=ready $(kubectl get pod -o name) --timeout 300s
 
-# kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
-# kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
-# kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
 
 ###############################
 # 6. Setup BookInfo cluster 2 #
