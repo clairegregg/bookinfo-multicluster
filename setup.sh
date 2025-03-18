@@ -27,6 +27,7 @@ sed -e "s/{i}/2/g" -e "s/{j}/1/g" platform/kube/bookinfo-db.yaml | kubectl apply
 sleep 2s
 echo "Waiting for mongodb to be ready"
 kubectl wait --for=condition=ready pod -l app=mongodb2 --timeout=300s -n mongodb
+sleep 5s
 
 
 #########################
