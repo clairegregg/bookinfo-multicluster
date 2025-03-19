@@ -364,8 +364,9 @@ def getProductReviews(product_id, headers):
     for _ in range(2):
         try:
             url = reviews['name'] + "/" + reviews['endpoint'] + "/" + str(product_id)
-            res = send_request(url, headers=headers, timeout=3.0)
-        except BaseException:
+            res = send_request(url, headers=headers, timeout=7.0)
+        except BaseException as e:
+            logging.warning("Failed to contact reviews with error: {e}", exc_info=True)
             res = None
         if res and res.status_code == 200:
             request_result_counter.labels(destination_app='reviews', response_code=200).inc()

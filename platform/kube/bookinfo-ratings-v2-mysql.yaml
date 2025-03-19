@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: ratings
-        image: docker.io/clairegregg/examples-bookinfo-ratings-v2:v1.0.3
+        image: docker.io/clairegregg/examples-bookinfo-ratings-v2:v1.0.5
         imagePullPolicy: IfNotPresent
         env:
           # ratings-v2 will use mongodb as the default db backend.
