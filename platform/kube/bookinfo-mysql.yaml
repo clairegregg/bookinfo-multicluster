@@ -59,7 +59,7 @@ spec:
     spec:
       containers:
       - name: mysqldb
-        image: docker.io/clairegregg/examples-bookinfo-mysqldb:v1.0.1
+        image: docker.io/clairegregg/examples-bookinfo-mysqldb:v1.0.2
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3306
