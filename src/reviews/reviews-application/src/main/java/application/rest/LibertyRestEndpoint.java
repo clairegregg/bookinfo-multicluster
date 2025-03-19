@@ -144,8 +144,8 @@ public class LibertyRestEndpoint extends Application {
 
     private JsonObject getRatings(String productId, HttpHeaders requestHeaders) {
       ClientBuilder cb = ClientBuilder.newBuilder();
-      System.out.println("Timeout is 10000");
-      Integer timeout = 10000;
+      System.out.println("Timeout is 30000");
+      Integer timeout = 30000;
       cb.property("com.ibm.ws.jaxrs.client.connection.timeout", timeout);
       cb.property("com.ibm.ws.jaxrs.client.receive.timeout", timeout);
       Client client = cb.build();
