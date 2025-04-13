@@ -60,7 +60,7 @@ def get_demand_points(graph: dict, service: str) -> list:
     print(f"Demand points for {service} in {graph["name"]} are {demand_points}")
     return demand_points
 
-def get_min_sv_edge_cutset(s: str, t: str, G: nx.Graph) -> float:
+def get_min_sv_node_cutset(s: str, t: str, G: nx.Graph) -> float:
    cut_weight = len(minimum_st_node_cut(G, s, t))
    print(f"Min node S-V cutset for {s}, {t} is {cut_weight}")
    return cut_weight
@@ -70,12 +70,12 @@ def find_resilience_service(graph: dict, service: str) -> float:
     D = get_demand_points(graph, service)
     if len(D) == 0:
         return None
-    min_sv_edge_cutsets = []
+    min_sv_node_cutsets = []
     for t in D:
-        min_sv_edge_cutsets.append(get_min_sv_edge_cutset(s, t, G))
-    return min(min_sv_edge_cutsets)
+        min_sv_node_cutsets.append(get_min_sv_node_cutset(s, t, G))
+    return min(min_sv_node_cutsets)
 
-def find_edge_resilience(graph: dict) -> float:
+def find_node_resilience(graph: dict) -> float:
     min_service_resiliences = []
     for service in graph["s"]:
         service_resilience = find_resilience_service(graph, service)
@@ -84,5 +84,5 @@ def find_edge_resilience(graph: dict) -> float:
     return min(min_service_resiliences)
 
 for graph in graphs:
-    graph_edge_resilience = find_edge_resilience(graph)
-    print(f"Graph node resilience for {graph["name"]} is {graph_edge_resilience}")
+    graph_node_resilience = find_node_resilience(graph)
+    print(f"Graph node resilience for {graph["name"]} is {graph_node_resilience}")
